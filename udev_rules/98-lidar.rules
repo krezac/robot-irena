@@ -1,0 +1,2 @@
+KERNEL=="ttyUSB*", ATTRS{interface}=="FT232R Lidar",SYMLINK+="irena_lidar"
+~ 

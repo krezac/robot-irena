@@ -1,0 +1,2 @@
+KERNEL=="ttyUSB*", ATTRS{interface}=="FT232R VectornavIMU",SYMLINK+="irena_vectornav"
+~ 
