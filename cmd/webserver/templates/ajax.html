@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Flot Examples: AJAX</title>
+	<link href="static_content/css/examples.css" rel="stylesheet" type="text/css">
+	<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="../../excanvas.min.js"></script><![endif]-->
+	<script language="javascript" type="text/javascript" src="static_content/js/jquery.min.js"></script>
+	<script language="javascript" type="text/javascript" src="static_content/js/jquery.flot.js"></script>
+	<script type="text/javascript">
+
+	$(function() {
+
+		var options = {
+			lines: {
+				show: true
+			},
+			points: {
+				show: true
+			},
+			xaxis: {
+				tickDecimals: 0,
+				tickSize: 1
+			},
+			yaxis: {
+				min: -180,
+				max: 180
+			}
+		};
+
+
+		// Fetch one series, adding to what we already have
+
+		// Initiate a recurring data update
+			dataBuffer = [];
+			for (var i = 0; i < 30; i++) {
+				dataBuffer.push(0); // prefill the buffer
+			}
+			var iteration = 0;
+
+			function fetchData() {
+
+				++iteration;
+
+				function onDataReceived(series) {
+
+					// Load all the data in one pass; if we only got partial
+					// data we could merge it with what we already have.
+
+					//item=[iteration, series.yaw];
+					//alert("Pushing" + item)
+
+						dataBuffer.push(series.yaw);
+						dataBuffer.splice(0,1)
+
+						// zip the stored data into 2d array
+						outdata = [[]];
+						for (var i = 0; i < dataBuffer.length; ++i) {
+							outdata[0].push([i, dataBuffer[i]])
+						}
+						//console.log(dataBuffer, outdata, outdata[0]);
+
+					$.plot("#placeholder", outdata, options);
+				}
+
+				// Normally we call the same URL - a script connected to a
+				// database - but in this case we only have static example
+				// files, so we need to modify the URL.
+
+				maxIterations = 25;
+
+				$.ajax({
+					url: "/imu",
+					type: "GET",
+					dataType: "json",
+					success: onDataReceived
+				});
+
+				if (iteration < maxIterations) {
+					$('#action_span').text("iteration: " + iteration + "/" + maxIterations);
+					setTimeout(fetchData, 200);
+				} else {
+					$('#action_span').text("Done");
+				}
+			}
+
+			setTimeout(fetchData, 200);
+	});
+
+	</script>
+</head>
+<body>
+
+		<div class="demo-container">
+			<div id="placeholder" class="demo-placeholder"></div>
+		</div>
+<div>
+		<span id="action_span">Polling</span>
+</div>
+
+</body>
+</html>

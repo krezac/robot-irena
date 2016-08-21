@@ -3,7 +3,8 @@ package vectornav
 import "testing"
 
 func TestParsingCorrect(t *testing.T) {
-	data, err := parseYMR("$VNYMR,+104.977,+004.548,-001.276,-00.8012,-02.7376,+01.0070,+00.837,+00.235,-10.414,-00.002081,-00.001151,+00.002113*61\r\n")
+	var data YMRDataFull
+	err := ParseYMR("$VNYMR,+104.977,+004.548,-001.276,-00.8012,-02.7376,+01.0070,+00.837,+00.235,-10.414,-00.002081,-00.001151,+00.002113*61\r\n", &data)
 	if err != nil {
 		t.Fatalf("Parsing failed: %v", err)
 	}
@@ -46,7 +47,8 @@ func TestParsingCorrect(t *testing.T) {
 }
 
 func TestParsingInvalidChsum(t *testing.T) {
-	_, err := parseYMR("$VNYMR,+104.977,+004.548,-001.276,-00.8012,-02.7376,+01.0070,+00.837,+00.235,-10.414,-00.002081,-00.001151,+00.002113*60\r\n")
+	var data YMRDataFull
+	err := ParseYMR("$VNYMR,+104.977,+004.548,-001.276,-00.8012,-02.7376,+01.0070,+00.837,+00.235,-10.414,-00.002081,-00.001151,+00.002113*60\r\n", &data)
 	if err == nil {
 		t.Errorf("Parsing did not failed")
 	}
